@@ -1,6 +1,7 @@
 import {
   createIngredient,
   deleteIngredient,
+  deleteRecipeIngredient,
   getIngredients,
 } from "../services/ingredient.service.js";
 
@@ -31,5 +32,16 @@ export async function handleDeleteIngredient(req, res) {
   } catch (error) {
     console.error(error);
     res.status(500).send("Hubo un error al eliminar el ingrediente");
+  }
+}
+export async function handleDeleteRecipeIngredient(req, res) {
+  const { recipeId, ingredientId } = req.params;
+  try {
+    const response = await deleteRecipeIngredient(recipeId, ingredientId);
+    res.status(200).send(response);
+  } catch (error) {
+    res
+      .status(500)
+      .send("Hubo un error al eliminar el ingrediente de la receta");
   }
 }

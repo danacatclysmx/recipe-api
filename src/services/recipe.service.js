@@ -1,4 +1,8 @@
 import db from "../db/database.js";
+import {
+  createIngredient,
+  addIngredientToRecipe,
+} from "./ingredient.service.js";
 
 export async function getRecipes() {
   const response = await db.all("SELECT * FROM recipes");
@@ -10,8 +14,14 @@ export async function createRecipe(title, instructions, ingredients) {
     "INSERT INTO recipes (title,instructions) VALUES (?,?) ",
     [title, instructions]
   );
+  const recipeId = result.lastID;
   console.log(result);
-  return { id: result.lastID, message: "la receta se creo correctamentre" };
+  // VAMOS A ASOCIAR INGREDIENTES A LA RECETA
+  for (const ingredient of ingredients) {
+    const ingredientId = (await createIngredient(ingredient.name)).id;
+    await addIngredientToRecipe(recipeId, ingredientId, ingredient.quantity);
+  }
+  return { id: recipeId, message: "la receta se creo correctamentre" };
 }
 export async function deleteRecipe(id) {
   await db.run("DELETE FROM recipes WHERE id=?", [id]);
